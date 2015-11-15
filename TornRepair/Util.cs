@@ -17,7 +17,7 @@ namespace TornRepair
     public static class Util
     {
         // some constants used in this program
-        // test GitHub
+        
         public const double MIN_AREA = 10;
         public const int STEP = 10;
         public const int DELTA_THETA = 10;
