@@ -48,6 +48,9 @@
             this.button8 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.button9 = new System.Windows.Forms.Button();
+            this.button10 = new System.Windows.Forms.Button();
+            this.button11 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.Output.SuspendLayout();
@@ -239,6 +242,7 @@
             this.textBox1.Location = new System.Drawing.Point(25, 916);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(1401, 237);
             this.textBox1.TabIndex = 19;
             // 
@@ -249,12 +253,45 @@
             this.progressBar1.Size = new System.Drawing.Size(591, 39);
             this.progressBar1.TabIndex = 20;
             // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(1449, 878);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(215, 81);
+            this.button9.TabIndex = 21;
+            this.button9.Text = "centeroid";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
+            // button10
+            // 
+            this.button10.Location = new System.Drawing.Point(1454, 1021);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(222, 85);
+            this.button10.TabIndex = 22;
+            this.button10.Text = "checkRotate";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(1761, 1021);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(206, 68);
+            this.button11.TabIndex = 23;
+            this.button11.Text = "CheckShift";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(2909, 1743);
+            this.Controls.Add(this.button11);
+            this.Controls.Add(this.button10);
+            this.Controls.Add(this.button9);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.button8);
@@ -306,6 +343,9 @@
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Button button11;
     }
 }
 

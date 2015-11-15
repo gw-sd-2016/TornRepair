@@ -34,6 +34,19 @@ namespace TornRepair
 
     }
 
+    public struct  ReturnImg
+    {
+        public Image<Gray, byte> img;
+        public Image<Gray, Byte> source1;
+        public Image<Gray, Byte> source2;
+        public Point center1;
+        public Point center2old;
+        public Point center2new;
+        public LineSegment2D centerLinee;
+        public Image<Gray, byte> rimg;
+        public bool returnbool;
+    }
+
     // This part is other's code
     public partial class Form1 : Form
     {
@@ -49,6 +62,9 @@ namespace TornRepair
 
         List<Image<Bgr, Byte>> imgs_scaled = new List<Image<Bgr, Byte>>();
         List<Image<Gray, Byte>> imgs_gray = new List<Image<Gray, Byte>>(); // all of the grayscale source images
+
+        Image<Gray, byte> joined;
+        Image<Gray, byte> joined_mask;
         public Form1()
         {
             InitializeComponent();
@@ -357,58 +373,134 @@ namespace TornRepair
 
         }
         // Real Matching algorithm
+        List<Match> segment;
+        Point cn1, cn2;
+        ReturnImg r10;
         private void button7_Click(object sender, EventArgs e)
         {
             progressBar1.Value = 0;
 
             int times = imgs_gray.Count;
-            int count = 1;
-            List<Image<Gray, Byte>> imgray = imgs_gray.ToList();
-            while (imgray.Count!=1)
+            int count = 0;
+            List<Image<Gray, Byte>> imgray = imgs_gray.ToList(); // used as queue
+            List<Image<Gray,byte>> mask=imgray.ToList(); // used as queue
+            //joined = new Image<Gray, byte>(640, 480);
+            while (imgray.Count != 1)
             {
                 int ind = 1;
                 int max_conf = 0; // max confidence
-                List<Match> segment = new List<Match>(); // The matching parameters for each segment of a part
+                segment = new List<Match>(); // The matching parameters for each segment of a part
                 List<int> confidence = new List<int>(); // The confidence level for each segment
 
                 // Match the pieces
-                for (int i = 1; i < imgs_gray.Count; ++i)
+                for (int i = 1+count; i < imgs_gray.Count; ++i)
                 {
                     // 0=this part, i=the index for other parts
                     textBox1.AppendText("Searching for best pair \n");
                     segment.Add(Util.partialMatch(DNAs[count], DNAs[i])); // add all the match parameter for other parts compare to this part
-                    confidence.Add((int)segment[i - 1].confidence); // add all the confidence level for other parts
+                    confidence.Add((int)segment[i -count- 1].confidence); // add all the confidence level for other parts
                     //Index of max confidence
-                    if (max_conf < confidence[i - 1])
+                    if (max_conf < confidence[i -count- 1])
                     {
-                        max_conf = confidence[i - 1];
-                        ind = i;
+                        max_conf = confidence[i -count- 1];
+                        ind = i-count;
                     }
                 }
                 textBox1.AppendText("Found \n");
 
                 //Join the pieces
                 textBox1.AppendText("Joining Them \n");
-                double rot=0.0;
+                double rot = 0.0;
                 Point c1, c2;
                 c1 = new Point();
                 c2 = new Point();
                 bool Joined = true;
                 Match m = segment[ind - 1];
-                Util.transformation(DNAs[0], DNAs[ind], ref m, ref c1, ref c2, ref rot);
+                Util.transformation(DNAs[count], DNAs[ind], ref m, ref c1, ref c2, ref rot);
+                rot = -rot; // this is the correct rotational angle
+                cn1 = c1;
+                cn2 = c2;
+                textBox1.AppendText(rot.ToString());
 
+                ReturnImg r = Util.transform(imgray[0], mask[0], imgray[ind], mask[ind], joined, joined_mask, c1, c2, -(rot+Math.PI) * (180.0 / Math.PI));
+                r10 = r;
+                pictureBox1.Image = r.source2.ToBitmap();
+                pictureBox2.Image = r.img.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
+                if (!r.returnbool)
+                {
+                    //r = Util.transform(imgray[0], mask[0], imgray[ind], mask[ind], joined, joined_mask, c1, c2, -rot*(180.0/Math.PI));
+                    if (!r.returnbool)
+                    {
+                        Joined = false;
+                    }
+                }
+                joined = r.img;
+                
 
+                if (!Joined)
+                {
+                    textBox1.AppendText("Failed to join");
+                    imgray.RemoveAt(0);
+                    mask.RemoveAt(0);
+                }
+                else
+                {
+                    textBox1.AppendText("Success to join");
+                    imgray.RemoveAt(0);
+                    mask.RemoveAt(0);
+                }
 
+                //pictureBox2.Image = joined.Resize(pictureBox2.Width,pictureBox2.Height,INTER.CV_INTER_LINEAR).ToBitmap();
 
+                progressBar1.Value += 100 / (times-1);
+                count++;
             }
-            progressBar1.Value = 100;
+           
 
 
 
         }
 
+        private void button10_Click(object sender, EventArgs e)
+        {
 
+            Image<Gray, byte> img102 = r10.source2;
+            Image<Bgr, byte> img101 = imgs_scaled[1].Clone();
+            textBox1.AppendText(r10.center2new.ToString() + "\n");
+            img101.Draw(new CircleF(r10.center2old, 2), new Bgr(255,0,0), 2);
+            img101.Draw(new CircleF(r10.center2new, 2), new Bgr(255,0,0), 2);
+            img102.Draw(new CircleF(r10.center2old, 2), new Gray(127), 2);
+            img102.Draw(new CircleF(r10.center2new, 2), new Gray(127), 2);
+            img102.Draw(new CircleF(new PointF(img102.Width/2,img102.Height/2), 2), new Gray(127), 2);
+            img102.Draw(r10.centerLinee, new Gray(127), 2);
+           
+            pictureBox1.Image = img101.ToBitmap();
+            pictureBox2.Image = img102.ToBitmap();
 
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            Image<Bgr, Byte> img11 = new Image<Bgr, byte>(new Size(pictureBox1.Width, pictureBox1.Height));
+            img11.Draw(new CircleF(r10.center1, 2), new Bgr(255,0,0), 2);
+            img11.Draw(new CircleF(r10.center2new, 2), new Bgr(0,255,0), 2);
+            pictureBox1.Image = img11.ToBitmap();
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            Image<Bgr, Byte> img91 = imgs_scaled[0].Clone();
+            Image<Bgr, Byte> img92 = imgs_scaled[1].Clone();
+           
+            textBox1.AppendText(cn1.ToString()+"\n");
+            textBox1.AppendText(cn2.ToString() + "\n");
+            
+            img91.Draw(new CircleF(cn1,2), new Bgr(255, 0, 0), 2);
+            img92.Draw(new CircleF(cn2, 2), new Bgr(255, 0, 0), 2);
+            pictureBox1.Image = img91.ToBitmap();
+            pictureBox2.Image = img92.ToBitmap();
+
+        }
     }
 
 }
