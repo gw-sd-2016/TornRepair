@@ -354,8 +354,8 @@ namespace TornRepair
             Point shift = new Point();
             shift.X = centroid1.X - centroid2.X;
             shift.Y = centroid1.Y - centroid2.Y;
-            E = E.Rotate(angle, new Gray(0)); // actual rotation happens here
-            E_mask = E_mask.Rotate(angle, new Gray(0));
+            E = E.Rotate(angle, new Gray(255)); // actual rotation happens here
+            E_mask = E_mask.Rotate(angle, new Gray(255));
 
 
             //Find optimal size of canvas to hold both images and appropriate transformations
@@ -398,8 +398,8 @@ namespace TornRepair
                     break;
             }
 
-            optimal_h = 1000;
-            optimal_w = 1000;
+            //optimal_h = 1000;
+            //optimal_w = 1000;
             dst = new Image<Gray, byte>(optimal_w, optimal_h);
             dst_mask = new Image<Gray, byte>(optimal_w, optimal_h);
 
@@ -449,9 +449,9 @@ namespace TornRepair
                     {
                         int i_new = i  +t2.Y;
                         int j_new = j  +t2.X;
-                        /*if (dst_mask.Data[i_new, j_new, 0] != 0)
+                        if (dst_mask.Data[i_new, j_new, 0] !=0)
                             intersections++;
-                        else*/
+                        else
                         {
                             dst.Data[i_new, j_new, 0] = E.Data[i, j, 0];
                             dst_mask.Data[i_new, j_new, 0] = 255;
@@ -469,6 +469,8 @@ namespace TornRepair
 
             /*cvReleaseImage(&E);
             cvReleaseImage(&E_mask);*/ // should not need these two lines because of garbage collection
+
+            // threshold detection is meaningless for 2-piece case, always success
 
             if (intersections > THRESHOLD)
             {

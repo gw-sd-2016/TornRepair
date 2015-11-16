@@ -428,7 +428,7 @@ namespace TornRepair
                 pictureBox2.Image = r.img.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
                 if (!r.returnbool)
                 {
-                    //r = Util.transform(imgray[0], mask[0], imgray[ind], mask[ind], joined, joined_mask, c1, c2, -rot*(180.0/Math.PI));
+                    r = Util.transform(imgray[0], mask[0], imgray[ind], mask[ind], joined, joined_mask, c1, c2, -rot*(180.0/Math.PI));
                     if (!r.returnbool)
                     {
                         Joined = false;
