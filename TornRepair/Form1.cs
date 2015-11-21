@@ -39,6 +39,7 @@ namespace TornRepair
     public struct  ReturnImg
     {
         public Image<Gray, byte> img;
+        public Image<Gray, byte> img_mask;
         public Image<Gray, Byte> source1;
         public Image<Gray, Byte> source2;
         public Point center1;
@@ -389,6 +390,18 @@ namespace TornRepair
             //joined = new Image<Gray, byte>(640, 480);
             while (imgray.Count != 1)
             {
+                dataGridView1.Rows.Clear();
+
+                for (int i = 0; i < imgray.Count; i++)
+                {
+
+                    using (Image<Gray, Byte> thumbnail = imgray[i].Resize(150, 150, INTER.CV_INTER_CUBIC, true))
+                    {
+                        DataGridViewRow row = dataGridView1.Rows[dataGridView1.Rows.Add()];
+                        row.Cells["Image"].Value = thumbnail.ToBitmap();
+                        row.Height = 150;
+                    }
+                }
                 int ind = 1;
                 int max_conf = 0; // max confidence
                 segment = new List<Match>(); // The matching parameters for each segment of a part
@@ -408,7 +421,7 @@ namespace TornRepair
                         ind = i-count;
                     }
                 }
-                textBox1.AppendText("Found \n");
+                textBox1.AppendText("Found"+(count+1)+"->"+(ind+count+1)+" \n");
 
                 //Join the pieces
                 textBox1.AppendText("Joining Them \n");
@@ -437,6 +450,7 @@ namespace TornRepair
                     }
                 }
                 joined = r.img;
+                joined_mask = r.img_mask;
                 pictureBox2.Image = joined.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
                 
 
@@ -449,15 +463,18 @@ namespace TornRepair
                 else
                 {
                     textBox1.AppendText("Success to join");
-                    imgray.RemoveAt(0);
-                    mask.RemoveAt(0);
+                    imgray[0] = joined;
+                    mask[0] = joined_mask;
+                    imgray.RemoveAt(ind);
+                    mask.RemoveAt(ind);
                 }
 
                 //pictureBox2.Image = joined.Resize(pictureBox2.Width,pictureBox2.Height,INTER.CV_INTER_LINEAR).ToBitmap();
 
                 progressBar1.Value += 100 / (times-1);
                 count++;
-               
+                
+                string promptValue = Prompt.ShowDialog("Test", "123");
                 //Thread.Sleep(2000);
             }
            
