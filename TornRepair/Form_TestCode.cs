@@ -123,6 +123,7 @@ namespace TornRepair
                     }
                 }
                 img2.CopyBlank();
+                img1 = imgs_scaled[0].Clone();
                 img2 = imgs_scaled[count].Clone();
                 // Test: Draw the possible connecting edges
                 // Will delete this if the matching algorithm works correctly
@@ -133,10 +134,16 @@ namespace TornRepair
                     int start2 = segment[i].t21;
                     int end2 = segment[i].t22;
                     List<Phi> dna = DNAs[count];
+                    List<Phi> dna2 = DNAs[0];
                     List<Phi> effective = new List<Phi>();
+                    List<Phi> eff2 = new List<Phi>();
                     for (int j = start1; j < end1; j++)
                     {
                         effective.Add(dna[j]);
+                    }
+                    for (int j = start2; j < end2; j++)
+                    {
+                        eff2.Add(dna2[j]);
                     }
                     List<Point> points = new List<Point>();
                     foreach (Phi p in effective)
@@ -148,6 +155,19 @@ namespace TornRepair
                     img2.DrawPolyline(points.ToArray(), false, new Bgr(0, 255 / (i + 1), 20 * i), 2);
                     //img2 = img2.Resize(pictureBox2.Width, pictureBox2.Height,INTER.CV_INTER_LINEAR);
                     pictureBox2.Image = img2.ToBitmap();
+
+                    List<Point> point2 = new List<Point>();
+                    foreach (Phi p in eff2)
+                    {
+                        point2.Add(new Point((int)p.x, (int)p.y));
+                    }
+
+
+                    img1.DrawPolyline(point2.ToArray(), false, new Bgr(0, 255 / (i + 1), 20 * i), 2);
+                    //img2 = img2.Resize(pictureBox2.Width, pictureBox2.Height,INTER.CV_INTER_LINEAR);
+                    pictureBox1.Image = img1.ToBitmap();
+
+
 
                 }
 

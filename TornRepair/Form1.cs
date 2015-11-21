@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Emgu.CV.CvEnum;
+using System.Threading;
+
 namespace TornRepair
 {
     // The struct used to describe the contour of a polygon
@@ -435,6 +437,7 @@ namespace TornRepair
                     }
                 }
                 joined = r.img;
+                pictureBox2.Image = joined.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
                 
 
                 if (!Joined)
@@ -454,6 +457,8 @@ namespace TornRepair
 
                 progressBar1.Value += 100 / (times-1);
                 count++;
+               
+                //Thread.Sleep(2000);
             }
            
 
