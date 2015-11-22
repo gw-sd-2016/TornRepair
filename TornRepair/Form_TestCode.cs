@@ -95,6 +95,47 @@ namespace TornRepair
             }
 
         }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+
+            Image<Gray, byte> img102 = r10.source2;
+            Image<Bgr, byte> img101 = imgs_scaled[1].Clone();
+            textBox1.AppendText(r10.center2new.ToString() + "\n");
+            img101.Draw(new CircleF(r10.center2old, 2), new Bgr(255, 0, 0), 2);
+            img101.Draw(new CircleF(r10.center2new, 2), new Bgr(255, 0, 0), 2);
+            img102.Draw(new CircleF(r10.center2old, 2), new Gray(127), 2);
+            img102.Draw(new CircleF(r10.center2new, 2), new Gray(127), 2);
+            img102.Draw(new CircleF(new PointF(img102.Width / 2, img102.Height / 2), 2), new Gray(127), 2);
+            img102.Draw(r10.centerLinee, new Gray(127), 2);
+
+            pictureBox1.Image = img101.ToBitmap();
+            pictureBox2.Image = img102.ToBitmap();
+
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            Image<Bgr, Byte> img11 = new Image<Bgr, byte>(new Size(pictureBox1.Width, pictureBox1.Height));
+            img11.Draw(new CircleF(r10.center1, 2), new Bgr(255, 0, 0), 2);
+            img11.Draw(new CircleF(r10.center2new, 2), new Bgr(0, 255, 0), 2);
+            pictureBox1.Image = img11.ToBitmap();
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            Image<Bgr, Byte> img91 = imgs_scaled[0].Clone();
+            Image<Bgr, Byte> img92 = imgs_scaled[1].Clone();
+
+            textBox1.AppendText(cn1.ToString() + "\n");
+            textBox1.AppendText(cn2.ToString() + "\n");
+
+            img91.Draw(new CircleF(cn1, 2), new Bgr(255, 0, 0), 2);
+            img92.Draw(new CircleF(cn2, 2), new Bgr(255, 0, 0), 2);
+            pictureBox1.Image = img91.ToBitmap();
+            pictureBox2.Image = img92.ToBitmap();
+
+        }
         // Test method for matching line
         private void button8_Click(object sender, EventArgs e)
         {

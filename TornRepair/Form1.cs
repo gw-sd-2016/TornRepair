@@ -483,46 +483,34 @@ namespace TornRepair
 
         }
 
-        private void button10_Click(object sender, EventArgs e)
+       
+
+        private void button12_Click(object sender, EventArgs e)
         {
-
-            Image<Gray, byte> img102 = r10.source2;
-            Image<Bgr, byte> img101 = imgs_scaled[1].Clone();
-            textBox1.AppendText(r10.center2new.ToString() + "\n");
-            img101.Draw(new CircleF(r10.center2old, 2), new Bgr(255,0,0), 2);
-            img101.Draw(new CircleF(r10.center2new, 2), new Bgr(255,0,0), 2);
-            img102.Draw(new CircleF(r10.center2old, 2), new Gray(127), 2);
-            img102.Draw(new CircleF(r10.center2new, 2), new Gray(127), 2);
-            img102.Draw(new CircleF(new PointF(img102.Width/2,img102.Height/2), 2), new Gray(127), 2);
-            img102.Draw(r10.centerLinee, new Gray(127), 2);
-           
-            pictureBox1.Image = img101.ToBitmap();
-            pictureBox2.Image = img102.ToBitmap();
-
+            string level = Prompt.ShowDialog("Shift Level", "123");
+            img1 = imgs_scaled[0].Clone(); // Color Image
+            img2 = imgs_scaled[0].Clone(); // Gray Image
+            Image<Gray, Byte> gray1 = img2.Convert<Gray, Byte>();
+            Image<Gray, byte> gray1_copy = gray1.Clone();
+            Point[] monoColorContour = MyUtil.getMaxContourMap(gray1);
+            List<ColorfulPoint> colorContourTest = new List<ColorfulPoint>();
+            for(int i=0; i < monoColorContour.Length; i++)
+            {
+                ColorfulPoint p = new ColorfulPoint();
+                p.X = monoColorContour[i].X;
+                p.Y = monoColorContour[i].Y;
+                p.color = new Bgr(255, 0, 0);
+                colorContourTest.Add(p);
+            }
+            List<ColorfulPoint> colorContour = MyUtil.getColorfulContour(monoColorContour, img1,int.Parse(level));
+            img1 = img1.CopyBlank();
+            MyUtil.DrawColorfulContour(colorContour, img1);
+            //img1.DrawPolyline(monoColorContour, true, new Bgr(255, 0, 0), 2);
+            pictureBox1.Image = img1.ToBitmap();
+            pictureBox2.Image = gray1.ToBitmap(); 
         }
 
-        private void button11_Click(object sender, EventArgs e)
-        {
-            Image<Bgr, Byte> img11 = new Image<Bgr, byte>(new Size(pictureBox1.Width, pictureBox1.Height));
-            img11.Draw(new CircleF(r10.center1, 2), new Bgr(255,0,0), 2);
-            img11.Draw(new CircleF(r10.center2new, 2), new Bgr(0,255,0), 2);
-            pictureBox1.Image = img11.ToBitmap();
-        }
-
-        private void button9_Click(object sender, EventArgs e)
-        {
-            Image<Bgr, Byte> img91 = imgs_scaled[0].Clone();
-            Image<Bgr, Byte> img92 = imgs_scaled[1].Clone();
-           
-            textBox1.AppendText(cn1.ToString()+"\n");
-            textBox1.AppendText(cn2.ToString() + "\n");
-            
-            img91.Draw(new CircleF(cn1,2), new Bgr(255, 0, 0), 2);
-            img92.Draw(new CircleF(cn2, 2), new Bgr(255, 0, 0), 2);
-            pictureBox1.Image = img91.ToBitmap();
-            pictureBox2.Image = img92.ToBitmap();
-
-        }
+       
     }
 
 }
