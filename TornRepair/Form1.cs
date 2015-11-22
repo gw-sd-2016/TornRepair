@@ -158,7 +158,7 @@ namespace TornRepair
             List<Phi> DNA = new List<Phi>(); // the final contour map with arc length and angle of each vertex
             /*img2 = imgs[imgs.Count-1].CopyBlank();
             Image<Gray, Byte> gray1 = imgs[imgs.Count-1].Convert<Gray, Byte>();*/
-            img2 = img1.CopyBlank();
+            img2 = img1.Copy();
             Image<Gray, Byte> gray1 = img1.Convert<Gray, Byte>();
             imgs_gray.Add(gray1.Clone());
 
@@ -502,12 +502,15 @@ namespace TornRepair
                 p.color = new Bgr(255, 0, 0);
                 colorContourTest.Add(p);
             }
-            List<ColorfulPoint> colorContour = MyUtil.getColorfulContour(monoColorContour, img1,int.Parse(level));
+            List<ColorfulPoint> colorContour = MyUtil.getColorfulContourCircleSample(monoColorContour, img1,int.Parse(level));
+            List<ColorfulPoint> colorContour2 = MyUtil.getColorfulContourAreaSample(monoColorContour, img1, int.Parse(level));
             img1 = img1.CopyBlank();
             MyUtil.DrawColorfulContour(colorContour, img1);
+            img2 = img2.CopyBlank();
+            MyUtil.DrawColorfulContour(colorContour2, img2);
             //img1.DrawPolyline(monoColorContour, true, new Bgr(255, 0, 0), 2);
             pictureBox1.Image = img1.ToBitmap();
-            pictureBox2.Image = gray1.ToBitmap(); 
+            pictureBox2.Image = img2.ToBitmap(); 
         }
 
        
