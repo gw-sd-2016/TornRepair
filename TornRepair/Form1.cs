@@ -502,12 +502,15 @@ namespace TornRepair
                 p.color = new Bgr(255, 0, 0);
                 colorContourTest.Add(p);
             }
-            ColorfulContourMap colorContour = MyUtil.getColorfulContourCircleSample(monoColorContour, img1,int.Parse(level));
+            //ColorfulContourMap colorContour = MyUtil.getColorfulContourCircleSample(monoColorContour, img1,int.Parse(level));
             ColorfulContourMap colorContour2 = MyUtil.getColorfulContourAreaSample(monoColorContour, img1, int.Parse(level));
-            img1 = img1.CopyBlank();
-            img2 = img2.CopyBlank();
-            colorContour.DrawTo( img1);
+            //img1 = img1.CopyBlank();
+            //img2 = img2.CopyBlank();
+            colorContour2.DrawTo( img1);
+            colorContour2.RotateAboutImage(45,img1);
+            img2 = img1.Rotate(45, new Bgr(255, 255, 255));
             colorContour2.DrawTo(img2);
+            
            
             //img1.DrawPolyline(monoColorContour, true, new Bgr(255, 0, 0), 2);
             pictureBox1.Image = img1.ToBitmap();

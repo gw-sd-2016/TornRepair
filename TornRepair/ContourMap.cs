@@ -43,5 +43,33 @@ namespace TornRepair
             }
         }
 
+        // transformations, also used in all the subclasses
+        /*
+        // translate
+        public void Translate(int x, int y)
+        {
+            
+
+        }
+
+        // rotate, angle is in degree
+        public void Rotate(double angle)
+        {
+
+        }
+
+        // scale
+        public void Scale(double x, double y)
+        {
+
+        }
+        // scale to a size
+        public void ScaleTo(int x, int y)
+        {
+
+        }*/
+        
+
+
     }
 }

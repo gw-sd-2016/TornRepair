@@ -19,6 +19,8 @@ namespace TornRepair
         public int X;
         public int Y;
         public Bgr color; // Color of the edge
+
+       
     }
     public static class Metrics
     {
@@ -241,6 +243,7 @@ namespace TornRepair
             return cmap;
         }
 
+        
         public static void DrawColorfulContour(List<ColorfulPoint> edge,Image<Bgr,byte> input)
         {
             foreach(ColorfulPoint p in edge)
