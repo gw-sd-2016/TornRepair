@@ -492,7 +492,7 @@ namespace TornRepair
             img2 = imgs_scaled[0].Clone(); // Gray Image
             Image<Gray, Byte> gray1 = img2.Convert<Gray, Byte>();
             Image<Gray, byte> gray1_copy = gray1.Clone();
-            Point[] monoColorContour = MyUtil.getMaxContourMap(gray1);
+            ContourMap monoColorContour = MyUtil.getMaxContourMap(gray1);
             List<ColorfulPoint> colorContourTest = new List<ColorfulPoint>();
             for(int i=0; i < monoColorContour.Length; i++)
             {
@@ -502,12 +502,13 @@ namespace TornRepair
                 p.color = new Bgr(255, 0, 0);
                 colorContourTest.Add(p);
             }
-            List<ColorfulPoint> colorContour = MyUtil.getColorfulContourCircleSample(monoColorContour, img1,int.Parse(level));
-            List<ColorfulPoint> colorContour2 = MyUtil.getColorfulContourAreaSample(monoColorContour, img1, int.Parse(level));
+            ColorfulContourMap colorContour = MyUtil.getColorfulContourCircleSample(monoColorContour, img1,int.Parse(level));
+            ColorfulContourMap colorContour2 = MyUtil.getColorfulContourAreaSample(monoColorContour, img1, int.Parse(level));
             img1 = img1.CopyBlank();
-            MyUtil.DrawColorfulContour(colorContour, img1);
             img2 = img2.CopyBlank();
-            MyUtil.DrawColorfulContour(colorContour2, img2);
+            colorContour.DrawTo( img1);
+            colorContour2.DrawTo(img2);
+           
             //img1.DrawPolyline(monoColorContour, true, new Bgr(255, 0, 0), 2);
             pictureBox1.Image = img1.ToBitmap();
             pictureBox2.Image = img2.ToBitmap(); 

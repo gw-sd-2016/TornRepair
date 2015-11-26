@@ -35,9 +35,9 @@ namespace TornRepair
     }
     public static class MyUtil
     {
-        public static Point[] getMaxContourMap(Image<Gray, byte> input)
+        public static ContourMap getMaxContourMap(Image<Gray, byte> input)
         {
-            Point[] result = new Point[4];
+            ContourMap result = new ContourMap();
             input = input.SmoothGaussian(3).ThresholdBinaryInv(new Gray(245), new Gray(255)).MorphologyEx(null, CV_MORPH_OP.CV_MOP_CLOSE, 2);
             using (MemStorage storage1 = new MemStorage())
             {
@@ -56,15 +56,16 @@ namespace TornRepair
                     }
 
                 }
-                result = maxArea.ToArray();
+                result = new ContourMap(maxArea.ToArray());
             }
             return result;
         }
         // get colorful contour using cross sampling
-        public static List<ColorfulPoint> getColorfulContour(Point[] edge, Image<Bgr, byte> input,int shift=0)
+        public static ColorfulContourMap getColorfulContour(ContourMap edge, Image<Bgr, byte> input,int shift=0)
         {
+            ColorfulContourMap cmap;
             List<ColorfulPoint> result=new List<ColorfulPoint>();
-            foreach(Point p in edge)
+            foreach(Point p in edge._points)
             {
                 ColorfulPoint cp = new ColorfulPoint();
                 cp.X = p.X;
@@ -113,15 +114,18 @@ namespace TornRepair
                 cp.color = nearbyColors.ElementAt(maxIndex);
                 result.Add(cp);
                
+               
 
             }
-            return result;
+            cmap = new ColorfulContourMap(result);
+            return cmap;
         }
         // get colorful contour use area sampling
-        public static List<ColorfulPoint> getColorfulContourAreaSample(Point[] edge, Image<Bgr, byte> input, int shift = 0)
+        public static ColorfulContourMap getColorfulContourAreaSample(ContourMap edge, Image<Bgr, byte> input, int shift = 0)
         {
+            ColorfulContourMap cmap;
             List<ColorfulPoint> result = new List<ColorfulPoint>();
-            foreach (Point p in edge)
+            foreach (Point p in edge._points)
             {
                 ColorfulPoint cp = new ColorfulPoint();
                 cp.X = p.X;
@@ -172,14 +176,16 @@ namespace TornRepair
 
 
             }
-            return result;
+            cmap = new ColorfulContourMap(result);
+            return cmap;
         }
 
         // get color using circle sampling
-        public static List<ColorfulPoint> getColorfulContourCircleSample(Point[] edge, Image<Bgr, byte> input, int shift = 0)
+        public static ColorfulContourMap getColorfulContourCircleSample(ContourMap edge, Image<Bgr, byte> input, int shift = 0)
         {
+            ColorfulContourMap cmap;
             List<ColorfulPoint> result = new List<ColorfulPoint>();
-            foreach (Point p in edge)
+            foreach (Point p in edge._points)
             {
                 ColorfulPoint cp = new ColorfulPoint();
                 cp.X = p.X;
@@ -231,7 +237,8 @@ namespace TornRepair
                 result.Add(cp);
 
             }
-            return result;
+            cmap = new ColorfulContourMap(result);
+            return cmap;
         }
 
         public static void DrawColorfulContour(List<ColorfulPoint> edge,Image<Bgr,byte> input)
