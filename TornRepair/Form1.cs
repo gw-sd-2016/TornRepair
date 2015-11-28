@@ -402,7 +402,7 @@ namespace TornRepair
                 List<int> confidence = new List<int>(); // The confidence level for each segment
 
                 // Match the pieces
-                for (int i = 1; i < imgs_gray.Count; ++i)
+                for (int i = 1; i < imgray.Count; ++i)
                 {
                     // 0=this part, i=the index for other parts
                     textBox1.AppendText("Searching for best pair \n");
@@ -412,7 +412,7 @@ namespace TornRepair
                     if (max_conf < confidence[i - 1])
                     {
                         max_conf = confidence[i - 1];
-                        ind = i-count;
+                        ind = i;
                     }
                 }
                 textBox1.AppendText("Found"+(0+1)+"->"+(ind+0+1)+" \n");
@@ -512,7 +512,7 @@ namespace TornRepair
                 List<int> confidence = new List<int>(); // The confidence level for each segment
 
                 // Match the pieces
-                for (int i = 1; i < imgs_scaled.Count; ++i)
+                for (int i = 1; i < imcolor.Count; ++i)
                 {
                     // 0=this part, i=the index for other parts
                     textBox1.AppendText("Searching for best pair \n");
@@ -522,7 +522,7 @@ namespace TornRepair
                     if (max_conf < confidence[i - 1])
                     {
                         max_conf = confidence[i - 1];
-                        ind = i - count;
+                        ind = i ;
                     }
                 }
                 textBox1.AppendText("Found" + (0 + 1) + "->" + (ind + 0 + 1) + " \n");
@@ -571,6 +571,12 @@ namespace TornRepair
                     textBox1.AppendText("Success to join");
                     imcolor[0] = joined_13;
                     mask[0] = joined_13_mask;
+                    ContourMap cmap = MyUtil.getMaxContourMap(joined_13.Convert<Gray, byte>());
+                    DNAs[0] = cmap.extractDNA();
+                    img2 = joined_13.Clone();
+                    cmap.DrawPolyTo(img2);
+                    pictureBox1.Image = img2.ToBitmap();
+
 
                     imcolor.RemoveAt(ind);
                     mask.RemoveAt(ind);
