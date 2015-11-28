@@ -51,6 +51,20 @@ namespace TornRepair
         public bool returnbool;
     }
 
+    public struct ReturnColorImg
+    {
+        public Image<Bgr, byte> img;
+        public Image<Bgr, byte> img_mask;
+        public Image<Bgr, Byte> source1;
+        public Image<Bgr, Byte> source2;
+        public Point center1;
+        public Point center2old;
+        public Point center2new;
+        public LineSegment2D centerLinee;
+        public Image<Bgr, byte> rimg;
+        public bool returnbool;
+    }
+
     // This part is other's code
     public partial class Form1 : Form
     {
@@ -69,6 +83,8 @@ namespace TornRepair
 
         Image<Gray, byte> joined;
         Image<Gray, byte> joined_mask;
+        Image<Bgr, byte> joined_13;
+        Image<Bgr, byte> joined_13_mask;
         public Form1()
         {
             InitializeComponent();
@@ -118,6 +134,7 @@ namespace TornRepair
         {
             img2 = img1.Copy();
             imgs_gray.Add(img2.Convert<Gray, byte>());
+            //imgs_scaled.Add(img2);
             ContourMap cmap = MyUtil.getMaxContourMap(img1.Convert<Gray, byte>());
             cmap.DrawPolyTo(img2);
             List<Phi> dna = cmap.extractDNA();
@@ -363,6 +380,7 @@ namespace TornRepair
             int count = 0;
             List<Image<Gray, Byte>> imgray = imgs_gray.ToList(); // used as queue
             List<Image<Gray,byte>> mask=imgray.ToList(); // used as queue
+            List<Image<Bgr, byte>> imcolor = imgs_scaled.ToList();
             //joined = new Image<Gray, byte>(640, 480);
             while (imgray.Count != 1)
             {
@@ -384,20 +402,20 @@ namespace TornRepair
                 List<int> confidence = new List<int>(); // The confidence level for each segment
 
                 // Match the pieces
-                for (int i = 1+count; i < imgs_gray.Count; ++i)
+                for (int i = 1; i < imgs_gray.Count; ++i)
                 {
                     // 0=this part, i=the index for other parts
                     textBox1.AppendText("Searching for best pair \n");
-                    segment.Add(Util.partialMatch(DNAs[count], DNAs[i])); // add all the match parameter for other parts compare to this part
-                    confidence.Add((int)segment[i -count- 1].confidence); // add all the confidence level for other parts
+                    segment.Add(Util.partialMatch(DNAs[0], DNAs[i])); // add all the match parameter for other parts compare to this part
+                    confidence.Add((int)segment[i - 1].confidence); // add all the confidence level for other parts
                     //Index of max confidence
-                    if (max_conf < confidence[i -count- 1])
+                    if (max_conf < confidence[i - 1])
                     {
-                        max_conf = confidence[i -count- 1];
+                        max_conf = confidence[i - 1];
                         ind = i-count;
                     }
                 }
-                textBox1.AppendText("Found"+(count+1)+"->"+(ind+count+1)+" \n");
+                textBox1.AppendText("Found"+(0+1)+"->"+(ind+0+1)+" \n");
 
                 //Join the pieces
                 textBox1.AppendText("Joining Them \n");
@@ -407,7 +425,7 @@ namespace TornRepair
                 c2 = new Point();
                 bool Joined = true;
                 Match m = segment[ind - 1];
-                Util.transformation(DNAs[count], DNAs[ind], ref m, ref c1, ref c2, ref rot);
+                Util.transformation(DNAs[0], DNAs[ind], ref m, ref c1, ref c2, ref rot);
                 rot = -rot; // this is the correct rotational angle
                 cn1 = c1;
                 cn2 = c2;
@@ -435,14 +453,18 @@ namespace TornRepair
                     textBox1.AppendText("Failed to join");
                     imgray.RemoveAt(0);
                     mask.RemoveAt(0);
+                    DNAs.RemoveAt(0);
+
                 }
                 else
                 {
                     textBox1.AppendText("Success to join");
                     imgray[0] = joined;
                     mask[0] = joined_mask;
+                    
                     imgray.RemoveAt(ind);
                     mask.RemoveAt(ind);
+                    DNAs.RemoveAt(ind);
                 }
 
                 //pictureBox2.Image = joined.Resize(pictureBox2.Width,pictureBox2.Height,INTER.CV_INTER_LINEAR).ToBitmap();
@@ -459,7 +481,112 @@ namespace TornRepair
 
         }
 
-       
+        private void button13_Click(object sender, EventArgs e)
+        {
+            progressBar1.Value = 0;
+
+            int times = imgs_gray.Count;
+            int count = 0;
+            List<Image<Gray, Byte>> imgray = imgs_gray.ToList(); // used as queue
+          
+            List<Image<Bgr, byte>> imcolor = imgs_scaled.ToList();
+            List<Image<Bgr, byte>> mask = imcolor.ToList(); // used as queue
+            //joined = new Image<Gray, byte>(640, 480);
+            while (imcolor.Count != 1)
+            {
+                dataGridView1.Rows.Clear();
+
+                for (int i = 0; i < imcolor.Count; i++)
+                {
+
+                    using (Image<Bgr, Byte> thumbnail = imcolor[i].Resize(150, 150, INTER.CV_INTER_CUBIC, true))
+                    {
+                        DataGridViewRow row = dataGridView1.Rows[dataGridView1.Rows.Add()];
+                        row.Cells["Image"].Value = thumbnail.ToBitmap();
+                        row.Height = 150;
+                    }
+                }
+                int ind = 1;
+                int max_conf = 0; // max confidence
+                segment = new List<Match>(); // The matching parameters for each segment of a part
+                List<int> confidence = new List<int>(); // The confidence level for each segment
+
+                // Match the pieces
+                for (int i = 1; i < imgs_scaled.Count; ++i)
+                {
+                    // 0=this part, i=the index for other parts
+                    textBox1.AppendText("Searching for best pair \n");
+                    segment.Add(Util.partialMatch(DNAs[0], DNAs[i])); // add all the match parameter for other parts compare to this part
+                    confidence.Add((int)segment[i - 1].confidence); // add all the confidence level for other parts
+                    //Index of max confidence
+                    if (max_conf < confidence[i - 1])
+                    {
+                        max_conf = confidence[i - 1];
+                        ind = i - count;
+                    }
+                }
+                textBox1.AppendText("Found" + (0 + 1) + "->" + (ind + 0 + 1) + " \n");
+
+                //Join the pieces
+                textBox1.AppendText("Joining Them \n");
+                double rot = 0.0;
+                Point c1, c2;
+                c1 = new Point();
+                c2 = new Point();
+                bool Joined = true;
+                Match m = segment[ind - 1];
+                Util.transformation(DNAs[0], DNAs[ind], ref m, ref c1, ref c2, ref rot);
+                rot = -rot; // this is the correct rotational angle
+                cn1 = c1;
+                cn2 = c2;
+                textBox1.AppendText(rot.ToString());
+
+                ReturnColorImg r = Util.transformColor(imcolor[0], mask[0], imcolor[ind], mask[ind], joined_13, joined_13_mask, c1, c2, -(rot + Math.PI) * (180.0 / Math.PI));
+                //r10 = r;
+                pictureBox1.Image = r.source2.ToBitmap();
+                pictureBox2.Image = r.img.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
+                if (!r.returnbool)
+                {
+                    r = Util.transformColor(imcolor[0], mask[0], imcolor[ind], mask[ind], joined_13, joined_13_mask, c1, c2, -rot * (180.0 / Math.PI));
+                    if (!r.returnbool)
+                    {
+                        Joined = false;
+                    }
+                }
+                joined_13 = r.img;
+                joined_13_mask = r.img_mask;
+                pictureBox2.Image = joined_13.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
+
+
+                if (!Joined)
+                {
+                    textBox1.AppendText("Failed to join");
+                    imcolor.RemoveAt(0);
+                    mask.RemoveAt(0);
+                    DNAs.RemoveAt(0);
+
+                }
+                else
+                {
+                    textBox1.AppendText("Success to join");
+                    imcolor[0] = joined_13;
+                    mask[0] = joined_13_mask;
+
+                    imcolor.RemoveAt(ind);
+                    mask.RemoveAt(ind);
+                    DNAs.RemoveAt(ind);
+                }
+
+                //pictureBox2.Image = joined.Resize(pictureBox2.Width,pictureBox2.Height,INTER.CV_INTER_LINEAR).ToBitmap();
+
+                progressBar1.Value += 100 / (times - 1);
+                count++;
+
+                string promptValue = Prompt.ShowDialog("Test", "123");
+                //Thread.Sleep(2000);
+            }
+
+        }
 
         private void button12_Click(object sender, EventArgs e)
         {
