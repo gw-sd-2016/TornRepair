@@ -13,9 +13,11 @@ using Emgu.CV.CvEnum;
 using System.Threading;
 namespace TornRepair
 {
+    // I just put the inheritance here, for now there is no actual inheritance
     public class ColorfulContourMap : ContourMap
     {
         new public List<ColorfulPoint>  _points;
+        new public List<ColorfulPoint> _polyPoints;
         public int Width { get; }
         public int Height { get; }
         public Point Center { get; }
@@ -141,6 +143,12 @@ namespace TornRepair
         {
            
 
+        }
+
+        // extract this contour map into DNA, the feature map
+        List<Phi> extractDNA()
+        {
+            return null;
         }
 
 

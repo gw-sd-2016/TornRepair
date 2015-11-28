@@ -45,9 +45,9 @@ c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\bin\Deb
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\bin\Debug\ZedGraph.xml
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\bin\Debug\zh-CN\Emgu.CV.UI.resources.dll
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\bin\Debug\zh-CN\ZedGraph.resources.dll
-c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.csprojResolveAssemblyReference.cache
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.Properties.Resources.resources
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.csproj.GenerateResource.Cache
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.exe
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.pdb
 C:\Users\坦\Documents\Visual Studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.Form1.resources
+C:\Users\坦\Documents\Visual Studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.csprojResolveAssemblyReference.cache

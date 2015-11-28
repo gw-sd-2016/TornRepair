@@ -58,6 +58,35 @@ namespace TornRepair
                     }
 
                 }
+                Contour<Point> poly = maxArea.ApproxPoly(1.0, storage1);
+                result = new ContourMap(maxArea.ToList(),poly.ToList());
+            }
+            return result;
+        }
+        
+        [Obsolete("Just for now")]
+        public static ContourMap getMaxPolyContourMap(Image<Gray, byte> input)
+        {
+            ContourMap result = new ContourMap();
+            input = input.SmoothGaussian(3).ThresholdBinaryInv(new Gray(245), new Gray(255)).MorphologyEx(null, CV_MORPH_OP.CV_MOP_CLOSE, 2);
+            using (MemStorage storage1 = new MemStorage())
+            {
+                Image<Gray, Byte> temp = input.Clone();
+                Contour<Point> contour = temp.FindContours(CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_NONE, RETR_TYPE.CV_RETR_EXTERNAL);
+                double area = Math.Abs(contour.Area);
+                Contour<Point> maxArea = contour;
+                contour = contour.HNext;
+                for (; contour != null; contour = contour.HNext)
+                {
+                    double nextArea = Math.Abs(contour.Area);
+                    if (area < nextArea)
+                    {
+                        area = nextArea;
+                        maxArea = contour;
+                    }
+
+                }
+                maxArea = maxArea.ApproxPoly(1.0, storage1);
                 result = new ContourMap(maxArea.ToArray());
             }
             return result;

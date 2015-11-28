@@ -21,6 +21,7 @@ namespace TornRepair
         public double y; // y position
         public double theta; // turning angle
         public int l; // arc length
+        public Bgr color; // edge color
     }
 
     public struct Match
@@ -115,38 +116,12 @@ namespace TornRepair
 
         private void button2_Click(object sender, EventArgs e)
         {
-            img2 = img1.CopyBlank();
-
-            Image<Gray, Byte> gray1 = img1.Convert<Gray, Byte>().PyrDown().PyrUp();
-            Image<Gray, Byte> cannyGray = gray1.Canny(120, 180); // The parameter is subjected to change
-
-            int green = 0;
-            int red = 0;
-            int count = 0;
-            using (MemStorage storage1 = new MemStorage())
-                // The contour map works similarly to a linked list in C, cannot traverse this using C# functions, must use provided CV functions
-                // This will generate 2 contour maps for a filled image part, one inner contour and one outer contour
-                // This only works for image parts filled with single color, not works for newspaper for now
-
-                for (Contour<Point> contours1 = cannyGray.FindContours(); contours1 != null; contours1 = contours1.HNext)
-                {
-                    // In test case 6, the image parts are placed in four corners of the canvas, so it can check if the contours are 
-                    // separated easier
-                    // Top left: (0,60),(222,322)
-                    // Top right: (180,280),(222,322)
-                    // Bottom left:(0,60),(0,60)
-                    // Bottom right: (180,280),(0,60)
-                    Point[] a = contours1.ToArray();
-                    // Only Draw Even Number
-                    if (/*ount % 4 == 2*/ true)
-                    {
-                        img2.Draw(contours1, new Bgr(255, green, red), 5);
-                    }
-                    green += 50;
-                    red += 20;
-                    count++;
-                }
-            label1.Text = "Contour:" + count;
+            img2 = img1.Copy();
+            imgs_gray.Add(img2.Convert<Gray, byte>());
+            ContourMap cmap = MyUtil.getMaxContourMap(img1.Convert<Gray, byte>());
+            cmap.DrawPolyTo(img2);
+            List<Phi> dna = cmap.extractDNA();
+            DNAs.Add(dna);
             pictureBox2.Image = img2.ToBitmap();
         }
 
@@ -189,6 +164,7 @@ namespace TornRepair
 
                 }
                 Point[] exactPoints = maxArea.ToArray();
+                // start of extraction
                 int i = 0;
                 foreach (Point point in exactPoints)
                 {
@@ -310,7 +286,7 @@ namespace TornRepair
                     tem.l = i;
                     DNA[i] = tem;
                 }
-                DNAs.Add(DNA);
+                DNAs.Add(DNA); // return DNA
 
                 verts.Add(verticies.Count);
                 order = DNAs.Count;
