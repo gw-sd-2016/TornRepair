@@ -18,9 +18,9 @@ namespace TornRepair
     {
         new public List<ColorfulPoint>  _points;
         new public List<ColorfulPoint> _polyPoints;
-        public int Width { get; }
-        public int Height { get; }
-        public Point Center { get; }
+        public int Width { get; internal set; }
+        public int Height { get; internal set; }
+        public Point Center { get; internal set; }
 
         // no use at all, just to bypass the IDE error checking
         public ColorfulContourMap()
@@ -150,6 +150,17 @@ namespace TornRepair
         {
             return null;
         }
+
+        public ColorfulContourMap Clone()
+        {
+            ColorfulContourMap cmap=new ColorfulContourMap();
+            cmap._points=_points;
+            cmap. _polyPoints=_polyPoints;
+            cmap.Width = Width;
+            cmap.Height = Height;
+            cmap.Center = Center;
+            return cmap;
+    }
 
 
     }

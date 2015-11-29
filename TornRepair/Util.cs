@@ -711,6 +711,8 @@ namespace TornRepair
                 img.center2new = centroid2;
                 img.centerLinee = centerLine;
                 img.returnbool = false;
+                img.translate1 = t1;
+                img.translate2 = t2;
                 return img;
             }
             else
@@ -725,6 +727,8 @@ namespace TornRepair
                 img.center2new = centroid2;
                 img.centerLinee = centerLine;
                 img.returnbool = true;
+                img.translate1 = t1;
+                img.translate2 = t2;
                 return img;
             }
         }

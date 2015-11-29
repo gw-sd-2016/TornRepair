@@ -63,6 +63,8 @@ namespace TornRepair
         public LineSegment2D centerLinee;
         public Image<Bgr, byte> rimg;
         public bool returnbool;
+        public Point translate1; // t1
+        public Point translate2; // t2
     }
 
     // This part is other's code
@@ -85,6 +87,8 @@ namespace TornRepair
         Image<Gray, byte> joined_mask;
         Image<Bgr, byte> joined_13;
         Image<Bgr, byte> joined_13_mask;
+
+        List<ColorfulContourMap> colorMaps=new List<ColorfulContourMap>();
         public Form1()
         {
             InitializeComponent();
@@ -136,9 +140,12 @@ namespace TornRepair
             imgs_gray.Add(img2.Convert<Gray, byte>());
             //imgs_scaled.Add(img2);
             ContourMap cmap = MyUtil.getMaxContourMap(img1.Convert<Gray, byte>());
+            ColorfulContourMap colorMap = MyUtil.getColorfulContourAreaSample(cmap,img1,2);
             cmap.DrawPolyTo(img2);
+            colorMap.DrawTo(img2);
             List<Phi> dna = cmap.extractDNA();
             DNAs.Add(dna);
+            colorMaps.Add(colorMap);
             pictureBox2.Image = img2.ToBitmap();
         }
 
@@ -402,7 +409,7 @@ namespace TornRepair
                 List<int> confidence = new List<int>(); // The confidence level for each segment
 
                 // Match the pieces
-                for (int i = 1; i < imgs_gray.Count; ++i)
+                for (int i = 1; i < imgray.Count; ++i)
                 {
                     // 0=this part, i=the index for other parts
                     textBox1.AppendText("Searching for best pair \n");
@@ -412,7 +419,7 @@ namespace TornRepair
                     if (max_conf < confidence[i - 1])
                     {
                         max_conf = confidence[i - 1];
-                        ind = i-count;
+                        ind = i;
                     }
                 }
                 textBox1.AppendText("Found"+(0+1)+"->"+(ind+0+1)+" \n");
@@ -512,7 +519,7 @@ namespace TornRepair
                 List<int> confidence = new List<int>(); // The confidence level for each segment
 
                 // Match the pieces
-                for (int i = 1; i < imgs_scaled.Count; ++i)
+                for (int i = 1; i < imcolor.Count; ++i)
                 {
                     // 0=this part, i=the index for other parts
                     textBox1.AppendText("Searching for best pair \n");
@@ -522,7 +529,7 @@ namespace TornRepair
                     if (max_conf < confidence[i - 1])
                     {
                         max_conf = confidence[i - 1];
-                        ind = i - count;
+                        ind = i ;
                     }
                 }
                 textBox1.AppendText("Found" + (0 + 1) + "->" + (ind + 0 + 1) + " \n");
@@ -543,16 +550,23 @@ namespace TornRepair
 
                 ReturnColorImg r = Util.transformColor(imcolor[0], mask[0], imcolor[ind], mask[ind], joined_13, joined_13_mask, c1, c2, -(rot + Math.PI) * (180.0 / Math.PI));
                 //r10 = r;
-                pictureBox1.Image = r.source2.ToBitmap();
-                pictureBox2.Image = r.img.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
+               
+                pictureBox1.Image = r.source1.ToBitmap();
+                Image<Bgr, byte> im2 = r.img;
+                pictureBox2.Image = im2.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
+                ColorfulContourMap colormap = colorMaps[ind].Clone();
+                colormap.RotateAboutImage(-(rot + Math.PI) * (180.0 / Math.PI),imcolor[ind]);
                 if (!r.returnbool)
                 {
                     r = Util.transformColor(imcolor[0], mask[0], imcolor[ind], mask[ind], joined_13, joined_13_mask, c1, c2, -rot * (180.0 / Math.PI));
+                    colormap = colorMaps[ind].Clone();
+                    colormap.RotateAboutImage(-rot * (180.0 / Math.PI), im2);
                     if (!r.returnbool)
                     {
                         Joined = false;
                     }
                 }
+                colorMaps[ind] = colormap;
                 joined_13 = r.img;
                 joined_13_mask = r.img_mask;
                 pictureBox2.Image = joined_13.Resize(pictureBox2.Width, pictureBox2.Height, INTER.CV_INTER_LINEAR).ToBitmap();
@@ -569,8 +583,16 @@ namespace TornRepair
                 else
                 {
                     textBox1.AppendText("Success to join");
+                    colorMaps[0].Translate(r.translate1.X,r.translate1.Y);
+                    colorMaps[ind].Translate(r.translate2.X,r.translate2.Y);
                     imcolor[0] = joined_13;
                     mask[0] = joined_13_mask;
+                    ContourMap cmap = MyUtil.getMaxContourMap(joined_13.Convert<Gray, byte>());
+                    DNAs[0] = cmap.extractDNA();
+                    img2 = joined_13.Clone();
+                    cmap.DrawPolyTo(img2);
+                    //pictureBox1.Image = img2.ToBitmap();
+
 
                     imcolor.RemoveAt(ind);
                     mask.RemoveAt(ind);
@@ -586,6 +608,16 @@ namespace TornRepair
                 //Thread.Sleep(2000);
             }
 
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            //img2.SetValue(new Bgr(255,255,255));
+            foreach(ColorfulContourMap cmap in colorMaps)
+            {
+                cmap.DrawTo(img2);
+                pictureBox2.Image = img2.ToBitmap();
+            }
         }
 
         private void button12_Click(object sender, EventArgs e)
