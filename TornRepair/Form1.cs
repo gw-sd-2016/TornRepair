@@ -144,6 +144,7 @@ namespace TornRepair
             cmap.DrawPolyTo(img2);
             colorMap.DrawTo(img2);
             List<Phi> dna = cmap.extractDNA();
+            List<Phi> cdna = colorMap.extractDNA();
             DNAs.Add(dna);
             colorMaps.Add(colorMap);
             pictureBox2.Image = img2.ToBitmap();
@@ -644,6 +645,7 @@ namespace TornRepair
             colorContour2.DrawTo( img1);
             colorContour2.RotateAboutImage(45,img1);
             img2 = img1.Rotate(45, new Bgr(255, 255, 255));
+            img2 = img2.CopyBlank();
             colorContour2.DrawTo(img2);
             
            

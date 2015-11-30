@@ -92,6 +92,7 @@ namespace TornRepair
             return result;
         }
         // get colorful contour using cross sampling
+        [Obsolete("Less accurate algorithm")]
         public static ColorfulContourMap getColorfulContour(ContourMap edge, Image<Bgr, byte> input,int shift=0)
         {
             ColorfulContourMap cmap;
@@ -148,7 +149,7 @@ namespace TornRepair
                
 
             }
-            cmap = new ColorfulContourMap(result);
+            cmap = new ColorfulContourMap();
             return cmap;
         }
         // get colorful contour use area sampling
@@ -156,6 +157,7 @@ namespace TornRepair
         {
             ColorfulContourMap cmap;
             List<ColorfulPoint> result = new List<ColorfulPoint>();
+            List<ColorfulPoint> polys = new List<ColorfulPoint>();
             foreach (Point p in edge._points)
             {
                 ColorfulPoint cp = new ColorfulPoint();
@@ -207,11 +209,63 @@ namespace TornRepair
 
 
             }
-            cmap = new ColorfulContourMap(result);
+            foreach (Point p in edge._polyPoints)
+            {
+                ColorfulPoint cp = new ColorfulPoint();
+                cp.X = p.X;
+                cp.Y = p.Y;
+                // color=(b->0,g->1,r->2)
+                // Bgr color = new Bgr(input.Data[p.Y + shift, p.X + shift, 0], input.Data[p.Y + shift, p.X + shift, 1], input.Data[p.Y + shift, p.X + shift, 2]);
+                // Add all colors of nearby pixels
+                HashSet<Bgr> nearbyColors = new HashSet<Bgr>();
+
+                for (int i = p.X - shift; i <= p.X + shift; i++)
+                {
+                    for (int j = p.Y - shift; j <= p.Y + shift; j++)
+                    {
+                        if (i >= 0 && i < input.Width)
+                        {
+                            if (j >= 0 && j < input.Height)
+                            {
+                                nearbyColors.Add(new Bgr(input.Data[j, i, 0], input.Data[j, i, 1], input.Data[j, i, 2]));
+                            }
+                        }
+                    }
+                }
+
+                // check the whiteness of nearby pixels, use the less whiteness pixel as edge color
+                double maxWhiteness = 0; // check max
+                int index = 0;
+                int maxIndex = 0;
+                foreach (Bgr c in nearbyColors)
+                {
+                    double whiteness = Metrics.Whiteness(c);
+                    if (whiteness > maxWhiteness)
+                    {
+                        maxWhiteness = whiteness;
+                        maxIndex = index;
+                    }
+                    index++;
+                }
+
+
+
+
+                //Color ccolor = Color.FromArgb((int)color.Red, (int)color.Green, (int)color.Blue);
+
+
+
+                cp.color = nearbyColors.ElementAt(maxIndex);
+                polys.Add(cp);
+
+
+            }
+            cmap = new ColorfulContourMap(result,polys);
             return cmap;
         }
 
         // get color using circle sampling
+        [Obsolete("Less accurate algorithm")]
         public static ColorfulContourMap getColorfulContourCircleSample(ContourMap edge, Image<Bgr, byte> input, int shift = 0)
         {
             ColorfulContourMap cmap;
@@ -268,7 +322,7 @@ namespace TornRepair
                 result.Add(cp);
 
             }
-            cmap = new ColorfulContourMap(result);
+            cmap = new ColorfulContourMap();
             return cmap;
         }
 
