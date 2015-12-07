@@ -72,6 +72,7 @@ namespace TornRepair
     {
 
         public List<List<Phi>> DNAs = new List<List<Phi>>();
+        public List<List<Phi>> CDNAs = new List<List<Phi>>();
         public List<Contour<Point>> results = new List<Contour<Point>>();
         public List<int> verts = new List<int>();
         public int order = 1;
@@ -147,6 +148,7 @@ namespace TornRepair
             List<Phi> cdna = colorMap.extractDNA();
             DNAs.Add(dna);
             colorMaps.Add(colorMap);
+            CDNAs.Add(cdna);
             pictureBox2.Image = img2.ToBitmap();
         }
 
@@ -524,7 +526,8 @@ namespace TornRepair
                 {
                     // 0=this part, i=the index for other parts
                     textBox1.AppendText("Searching for best pair \n");
-                    segment.Add(Util.partialMatch(DNAs[0], DNAs[i])); // add all the match parameter for other parts compare to this part
+                    //segment.Add(Util.partialMatch(DNAs[0], DNAs[i])); // add all the match parameter for other parts compare to this part
+                    segment.Add(ColorfulMatchUtil.partialColorMatch(CDNAs[0], CDNAs[i])); // add all the match parameter for other parts compare to this part
                     confidence.Add((int)segment[i - 1].confidence); // add all the confidence level for other parts
                     //Index of max confidence
                     if (max_conf < confidence[i - 1])
@@ -543,7 +546,8 @@ namespace TornRepair
                 c2 = new Point();
                 bool Joined = true;
                 Match m = segment[ind - 1];
-                Util.transformation(DNAs[0], DNAs[ind], ref m, ref c1, ref c2, ref rot);
+                //Util.transformation(DNAs[0], DNAs[ind], ref m, ref c1, ref c2, ref rot);
+                Util.transformation(CDNAs[0], CDNAs[ind], ref m, ref c1, ref c2, ref rot);
                 rot = -rot; // this is the correct rotational angle
                 cn1 = c1;
                 cn2 = c2;
@@ -578,7 +582,8 @@ namespace TornRepair
                     textBox1.AppendText("Failed to join");
                     imcolor.RemoveAt(0);
                     mask.RemoveAt(0);
-                    DNAs.RemoveAt(0);
+                   // DNAs.RemoveAt(0);
+                    CDNAs.RemoveAt(0);
 
                 }
                 else
@@ -589,7 +594,8 @@ namespace TornRepair
                     imcolor[0] = joined_13;
                     mask[0] = joined_13_mask;
                     ContourMap cmap = MyUtil.getMaxContourMap(joined_13.Convert<Gray, byte>());
-                    DNAs[0] = cmap.extractDNA();
+                   // DNAs[0] = cmap.extractDNA();
+                    CDNAs[0] = cmap.extractDNA();
                     img2 = joined_13.Clone();
                     cmap.DrawPolyTo(img2);
                     //pictureBox1.Image = img2.ToBitmap();
@@ -597,7 +603,8 @@ namespace TornRepair
 
                     imcolor.RemoveAt(ind);
                     mask.RemoveAt(ind);
-                    DNAs.RemoveAt(ind);
+                    //DNAs.RemoveAt(ind);
+                    CDNAs.RemoveAt(ind);
                 }
 
                 //pictureBox2.Image = joined.Resize(pictureBox2.Width,pictureBox2.Height,INTER.CV_INTER_LINEAR).ToBitmap();
@@ -618,6 +625,93 @@ namespace TornRepair
             {
                 cmap.DrawTo(img2);
                 pictureBox2.Image = img2.ToBitmap();
+            }
+        }
+
+        private void button15_Click(object sender, EventArgs e)
+        {
+            int times = imgs_gray.Count;
+            int count = 1;
+            List<Image<Gray, Byte>> imgray = imgs_gray.ToList(); // used as queue
+
+            List<Image<Bgr, byte>> imcolor = imgs_scaled.ToList();
+            List<Image<Bgr, byte>> mask = imcolor.ToList(); // used as queue
+            while (imcolor.Count != 1)
+            {
+                int ind = 1;
+                int max_conf = 0; // max confidence
+                List<Match> segment = new List<Match>(); // The matching parameters for each segment of a part
+                List<int> confidence = new List<int>(); // The confidence level for each segment
+
+                // Match the pieces
+                for (int i = 1; i < imcolor.Count; ++i)
+                {
+                    // 0=this part, i=the index for other parts
+
+                    segment.Add(ColorfulMatchUtil.partialColorMatch(CDNAs[0], CDNAs[1])); // add all the match parameter for other parts compare to this part
+                    confidence.Add((int)segment[i - 1].confidence); // add all the confidence level for other parts
+                    //Index of max confidence
+                    if (max_conf < confidence[i - 1])
+                    {
+                        max_conf = confidence[i - 1];
+                        ind = i;
+                    }
+                }
+                img2.CopyBlank();
+                img1 = imgs_scaled[0].Clone();
+                img2 = imgs_scaled[count].Clone();
+                // Test: Draw the possible connecting edges
+                // Will delete this if the matching algorithm works correctly
+                for (int i = 0; i < segment.Count; i++)
+                {
+                    int start1 = segment[i].t11;
+                    int end1 = segment[i].t12;
+                    int start2 = segment[i].t21;
+                    int end2 = segment[i].t22;
+                    List<Phi> dna = CDNAs[count];
+                    List<Phi> dna2 = CDNAs[0];
+                    List<Phi> effective = new List<Phi>();
+                    List<Phi> eff2 = new List<Phi>();
+                    for (int j = start1; j < end1; j++)
+                    {
+                        effective.Add(dna[j]);
+                    }
+                    for (int j = start2; j < end2; j++)
+                    {
+                        eff2.Add(dna2[j]);
+                    }
+                    List<Point> points = new List<Point>();
+                    foreach (Phi p in effective)
+                    {
+                        points.Add(new Point((int)p.x, (int)p.y));
+                    }
+
+
+                    img2.DrawPolyline(points.ToArray(), false, new Bgr(0, 255 / (i + 1), 20 * i), 2);
+                    //img2 = img2.Resize(pictureBox2.Width, pictureBox2.Height,INTER.CV_INTER_LINEAR);
+                    pictureBox2.Image = img2.ToBitmap();
+
+                    List<Point> point2 = new List<Point>();
+                    foreach (Phi p in eff2)
+                    {
+                        point2.Add(new Point((int)p.x, (int)p.y));
+                    }
+
+
+                    img1.DrawPolyline(point2.ToArray(), false, new Bgr(0, 255 / (i + 1), 20 * i), 2);
+                    //img2 = img2.Resize(pictureBox2.Width, pictureBox2.Height,INTER.CV_INTER_LINEAR);
+                    pictureBox1.Image = img1.ToBitmap();
+
+
+
+                }
+
+                textBox1.AppendText("Matched \n");
+
+                count++;
+                times--;
+                //Join the pieces
+                break;
             }
         }
 

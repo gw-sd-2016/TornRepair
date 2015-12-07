@@ -47,6 +47,7 @@ namespace TornRepair
         public const int MULT = 3;
         public const int MIN_TURN = 6;
         public const int THRESHOLD = 5000;
+        public const int MIN_COLOR_SHIFT = 2; // as the API said
 
         // Calculate the turning angle
 

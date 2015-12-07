@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Emgu.CV.CvEnum;
 using System.Threading;
+using ColorMine.ColorSpaces;
 
 namespace TornRepair
 {
@@ -31,12 +32,19 @@ namespace TornRepair
             // get saturation and brightness
             float s = c.GetSaturation();
             float b = c.GetBrightness();
+            
             // get whiteness
             return Math.Sqrt(s*s+(1- b)*(1- b));
         }
     }
     public static class MyUtil
     {
+        public static void testColorMine()
+        {
+            var myRgb = new ColorMine.ColorSpaces.Rgb { R = 149, G = 13, B = 12 };
+            var myCmy = myRgb.To<Cmy>();
+            
+        }
         public static ContourMap getMaxContourMap(Image<Gray, byte> input)
         {
             ContourMap result = new ContourMap();

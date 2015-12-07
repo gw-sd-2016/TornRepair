@@ -51,3 +51,4 @@ c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\obj\Deb
 c:\users\坦\documents\visual studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.pdb
 C:\Users\坦\Documents\Visual Studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.Form1.resources
 C:\Users\坦\Documents\Visual Studio 2015\Projects\TornRepair\TornRepair\obj\Debug\TornRepair.csprojResolveAssemblyReference.cache
+C:\Users\坦\Documents\Visual Studio 2015\Projects\TornRepair\TornRepair\bin\Debug\ColorMine.dll
