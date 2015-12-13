@@ -143,7 +143,7 @@ namespace TornRepair
             ContourMap cmap = MyUtil.getMaxContourMap(img1.Convert<Gray, byte>());
             ColorfulContourMap colorMap = MyUtil.getColorfulContourAreaSample(cmap,img1,2);
             cmap.DrawPolyTo(img2);
-            colorMap.DrawTo(img2);
+            //colorMap.DrawTo(img2);
             List<Phi> dna = cmap.extractDNA();
             List<Phi> cdna = colorMap.extractDNA();
             DNAs.Add(dna);
@@ -594,8 +594,8 @@ namespace TornRepair
                     imcolor[0] = joined_13;
                     mask[0] = joined_13_mask;
                     ContourMap cmap = MyUtil.getMaxContourMap(joined_13.Convert<Gray, byte>());
-                   // DNAs[0] = cmap.extractDNA();
-                    CDNAs[0] = cmap.extractDNA();
+                   //DNAs[0] = cmap.extractDNA();
+                   CDNAs[0] = cmap.extractDNA();
                     img2 = joined_13.Clone();
                     cmap.DrawPolyTo(img2);
                     //pictureBox1.Image = img2.ToBitmap();
