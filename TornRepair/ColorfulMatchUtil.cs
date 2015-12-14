@@ -44,7 +44,7 @@ namespace TornRepair
                 seq2 = DNAseq1.ToList();//reverse the smaller one
                 seq2.Reverse();
             }
-            List<int> zc=new List<int>();
+            List<int> zc = new List<int>();
             List<int> starts = new List<int>();
             for (int shift = 0; shift < seq1.Count - seq2.Count; shift += Util.STEP)
             {
@@ -55,7 +55,7 @@ namespace TornRepair
                 int zeroCount = 0;
                 for (int i = 0; i < seq2.Count; ++i)
                 {
-                    int difference = colorDifference(seq1[i + shift].color,seq2[i].color);
+                    int difference = colorDifference(seq1[i + shift].color, seq2[i].color);
                     if (difference == 0)
                     {
                         if (!flag1)
@@ -69,7 +69,7 @@ namespace TornRepair
                     diff.Add(difference);
                 }
                 zc.Add(zeroCount);
-                if (zeroCount==0)
+                if (zeroCount == 0)
                 {
                     starts.Add(-1);
                 }
@@ -80,41 +80,41 @@ namespace TornRepair
                 {
                     Console.WriteLine("22");
                 }*/
-                
-               /* if (best < max_match)
-                {
-                    offset = shift;
-                    best = max_match;
-                    int t_start = start + shift;
-                    int t_end = end + shift;
-                    if (start + shift >= seq1.Count / 2)
-                        t_start = start + shift - seq1.Count / 2;
-                    if (end + shift >= seq1.Count / 2)
-                        t_end = end + shift - seq1.Count / 2;
-                    length = t_start - t_end; // problematic
-                   
 
-                    if (flag)
-                    {
-                        segment.t21 = seq2.Count - end - 1;
-                        segment.t22 = seq2.Count - start - 1;
-                        segment.t11 = t_start;
-                        segment.t12 = t_end;
-                    }
-                    else
-                    {
-                        segment.t11 = seq2.Count - end - 1;
-                        segment.t12 = seq2.Count - start - 1;
-                        segment.t21 = t_start;
-                        segment.t22 = t_end;
-                    }
-                } */
+                /* if (best < max_match)
+                 {
+                     offset = shift;
+                     best = max_match;
+                     int t_start = start + shift;
+                     int t_end = end + shift;
+                     if (start + shift >= seq1.Count / 2)
+                         t_start = start + shift - seq1.Count / 2;
+                     if (end + shift >= seq1.Count / 2)
+                         t_end = end + shift - seq1.Count / 2;
+                     length = t_start - t_end; // problematic
+
+
+                     if (flag)
+                     {
+                         segment.t21 = seq2.Count - end - 1;
+                         segment.t22 = seq2.Count - start - 1;
+                         segment.t11 = t_start;
+                         segment.t12 = t_end;
+                     }
+                     else
+                     {
+                         segment.t11 = seq2.Count - end - 1;
+                         segment.t12 = seq2.Count - start - 1;
+                         segment.t21 = t_start;
+                         segment.t22 = t_end;
+                     }
+                 } */
             }
 
             Console.WriteLine("Max:" + zc.Max());
-            int t_shift=0;
+            int t_shift = 0;
             int s_start = 0;
-            for(int i=0; i < zc.Count; i++)
+            for (int i = 0; i < zc.Count; i++)
             {
                 if (zc[i] == zc.Max())
                 {
@@ -126,14 +126,15 @@ namespace TornRepair
             int endPos1 = startPos1 + zc.Max();
             int startPos2 = s_start;
             int endPos2 = startPos2 + zc.Max();
+            length = zc.Max();
             // check if the algorithm get the correct position of the matching color
             Console.WriteLine("Flag:" + flag);
-            Console.WriteLine("Shiftreq:" +startPos1);
+            Console.WriteLine("Shiftreq:" + startPos1);
             Console.WriteLine("Count:" + DNAseq1.Count);
 
-            Console.WriteLine("P1_start_x"+seq1[startPos1].x);
-            Console.WriteLine("P1_start_y"+seq1[startPos1].y);
-            Console.WriteLine("P1_end_x"+seq1[endPos1].x);
+            Console.WriteLine("P1_start_x" + seq1[startPos1].x);
+            Console.WriteLine("P1_start_y" + seq1[startPos1].y);
+            Console.WriteLine("P1_end_x" + seq1[endPos1].x);
             Console.WriteLine("P1_end_y" + seq1[endPos1].y);
 
             Console.WriteLine("P2_start_x" + seq2[startPos2].x);
@@ -141,19 +142,100 @@ namespace TornRepair
             Console.WriteLine("P2_end_x" + seq2[endPos2].x);
             Console.WriteLine("P2_end_y" + seq2[endPos2].y);
 
+            // regression analysis for the relationship between seq and DNA
+            // flag=true for 3*3 frag5 and frag6
+            if (flag)
+            {
 
-            int t_start = t_shift;
+                for (int j = 0; j < DNAseq1.Count; j++)
+                {
+                    if ((seq1[startPos1].x == DNAseq1[j].x) && (seq1[startPos1].y == DNAseq1[j].y))
+                    {
+                        segment.t11 = j;
+                        //segment.x11 = (int)DNAseq1[j].x;
+                       // segment.y11 = (int)DNAseq1[j].y;
+                        segment.t12 = j + zc.Max();
+                        if (segment.t12 >= DNAseq1.Count)
+                        {
+                            segment.t12 -= DNAseq1.Count;
+                        }
+                        //segment.x12 = (int)DNAseq1[j + zc.Max()].x;
+                        //segment.y12 = (int)DNAseq1[j + zc.Max()].y;
+                    }
+                }
+                
+
+                for (int j = 0; j < DNAseq2.Count; j++)
+                {
+                    if ((seq2[startPos2].x == DNAseq2[j].x) && (seq2[startPos2].y == DNAseq2[j].y))
+                    {
+                        segment.t21 = j;
+                        //segment.x21 = (int)DNAseq2[j].x;
+                        //segment.y21 = (int)DNAseq2[j].y;
+                        segment.t22 = j - zc.Max();
+                        if (segment.t22 < 0)
+                        {
+                            segment.t22 += DNAseq2.Count;
+                        }
+                        //segment.x22 = (int)DNAseq2[j - zc.Max()].x;
+                        //segment.y22 = (int)DNAseq2[j - zc.Max()].y;
+                    }
+                }
+
+            }
+            else
+            {
+                for (int j = 0; j < DNAseq2.Count; j++)
+                {
+                    if ((seq1[startPos1].x == DNAseq2[j].x) && (seq1[startPos1].y == DNAseq2[j].y))
+                    {
+                        segment.t11 = j;
+                        //segment.x11 = (int)DNAseq2[j].x;
+                        
+                        //segment.y11 = (int)DNAseq2[j].y;
+                        segment.t12 = j - zc.Max();
+                        if (segment.t12 < 0)
+                        {
+                            segment.t12 += DNAseq2.Count;
+                        }
+                       // segment.x12 = (int)DNAseq2[j - zc.Max()].x;
+                        //segment.y12 = (int)DNAseq2[j - zc.Max()].y;
+                    }
+                }
+
+                for (int j = 0; j < DNAseq1.Count; j++)
+                {
+                    if ((seq2[startPos2].x == DNAseq1[j].x) && (seq2[startPos2].y == DNAseq1[j].y))
+                    {
+                        segment.t21 = j;
+                       // segment.x21 = (int)DNAseq1[j].x;
+                       // segment.y21 = (int)DNAseq1[j].y;
+                        segment.t22 = j + zc.Max();
+                        if (segment.t22 >= DNAseq1.Count)
+                        {
+                            segment.t22 -= DNAseq1.Count;
+                        }
+                        //segment.x22 = (int)DNAseq1[j + zc.Max()].x;
+                        //segment.y22 = (int)DNAseq1[j + zc.Max()].y;
+                    }
+                }
+
+            }
+
+
+
+            /*int t_start = t_shift;
             int t_end = t_shift;
             if (t_shift >= seq1.Count / 2)
                 t_start = t_shift - seq1.Count / 2;
             if (t_shift >= seq1.Count / 2)
                 t_end = t_shift - seq1.Count / 2;
-            length = t_start - t_end; // problematic
+            length = zc.Max(); // problematic
 
 
-            if (flag)
+            /*if (flag)
             {
-                segment.t21 = seq2.Count -  - 1;
+                segment.t21 = seq2.Count - -1;
                 segment.t22 = seq2.Count - t_start - 1;
                 segment.t11 = t_start;
                 segment.t12 = t_end;
@@ -164,7 +246,10 @@ namespace TornRepair
                 segment.t12 = seq2.Count - t_start - 1;
                 segment.t21 = t_start;
                 segment.t22 = t_end;
-            }
+            }*/
+
+            // fine code below
+            
 
             segment.x11 = (int)DNAseq1[segment.t11].x;
             segment.y11 = (int)DNAseq1[segment.t11].y;
@@ -175,10 +260,12 @@ namespace TornRepair
             segment.y21 = (int)DNAseq2[segment.t21].y;
             segment.x22 = (int)DNAseq2[segment.t22].x;
             segment.y22 = (int)DNAseq2[segment.t22].y;
-            if (best == 0)
+            
+            /*if (best == 0)
                 segment.confidence = 0;
             else
-                segment.confidence = Math.Sqrt((double)(length * length) / best);
+                segment.confidence = Math.Sqrt((double)(length * length) / best); */
+            segment.confidence = length;
             return segment;
 
         }
@@ -188,7 +275,7 @@ namespace TornRepair
             var myRGB1 = new ColorMine.ColorSpaces.Rgb { R = c1.Red, G = c1.Green, B = c1.Blue };
             var myRGB2 = new ColorMine.ColorSpaces.Rgb { R = c2.Red, G = c2.Green, B = c2.Blue };
 
-            return (int)myRGB1.Compare(myRGB2, new Cie1976Comparison()); 
+            return (int)myRGB1.Compare(myRGB2, new Cie1976Comparison());
         }
         // Theta means the color difference in this case, the delta theta is 2 because the API said a difference of 2 is indifferent
         // for human perception
@@ -265,7 +352,7 @@ namespace TornRepair
             int count = 0;
             for (int i = 1; i < X.Count; ++i)
             {
-                if (colorDifference(X[i],initial) > Util.MIN_COLOR_SHIFT)
+                if (colorDifference(X[i], initial) > Util.MIN_COLOR_SHIFT)
                 {
                     count++;
                     initial = X[i];

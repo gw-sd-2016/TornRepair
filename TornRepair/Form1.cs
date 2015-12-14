@@ -668,20 +668,52 @@ namespace TornRepair
                     int end1 = segment[i].t12;
                     int start2 = segment[i].t21;
                     int end2 = segment[i].t22;
-                    List<Phi> dna = CDNAs[count];
-                    List<Phi> dna2 = CDNAs[0];
+                    List<Phi> dna = CDNAs[0];
+                    List<Phi> dna2 = CDNAs[1];
                     List<Phi> effective = new List<Phi>();
                     List<Phi> eff2 = new List<Phi>();
-                    for (int j = start1; j < end1; j++)
+                    // arbitration of start and end point
+
+                    int s1= getStartAndEnd(ref start1, ref end1, CDNAs[0].Count,(int)segment[i].confidence);
+                    int s2= getStartAndEnd(ref start2, ref end2, CDNAs[1].Count,(int)segment[i].confidence);
+                    if (s1 == 0)
                     {
-                        effective.Add(dna[j]);
+                        for (int j = start1; j < end1; j++)
+                        {
+                            effective.Add(dna[j]);
+                        }
                     }
-                    for (int j = start2; j < end2; j++)
+                    else
                     {
-                        eff2.Add(dna2[j]);
+                        for (int j = start1; j < dna.Count; j++)
+                        {
+                            effective.Add(dna[j]);
+                        }
+                        for(int j=0; j < end1;j++)
+                        {
+                            effective.Add(dna[j]);
+                        }
+                    }
+                    if (s2 == 0)
+                    {
+                        for (int j = start2; j < end2; j++)
+                        {
+                            eff2.Add(dna2[j]);
+                        }
+                    }
+                    else
+                    {
+                        for (int j = start2; j < dna2.Count; j++)
+                        {
+                            eff2.Add(dna2[j]);
+                        }
+                        for (int j = 0; j < end2; j++)
+                        {
+                            eff2.Add(dna2[j]);
+                        }
                     }
                     List<Point> points = new List<Point>();
-                    foreach (Phi p in effective)
+                    foreach (Phi p in eff2)
                     {
                         points.Add(new Point((int)p.x, (int)p.y));
                     }
@@ -692,7 +724,7 @@ namespace TornRepair
                     pictureBox2.Image = img2.ToBitmap();
 
                     List<Point> point2 = new List<Point>();
-                    foreach (Phi p in eff2)
+                    foreach (Phi p in effective)
                     {
                         point2.Add(new Point((int)p.x, (int)p.y));
                     }
@@ -713,6 +745,37 @@ namespace TornRepair
                 //Join the pieces
                 break;
             }
+        }
+
+        // get the real start point and real end point, if the contour passes the origin return 1, else return 0
+        private int getStartAndEnd(ref int v1, ref int v2, int addLength,int reqLength)
+        {
+            if (v2 - v1 == reqLength)
+            {
+                return 0;
+            }
+            else if (v1- v2 == reqLength)
+            {
+                int v3;
+                v3 = v1;
+                v1 = v2;
+                v2 = v3;
+                return 0;
+            }
+            // if the contour pass the origin
+            else if (v1 +addLength-v2==reqLength)
+            {
+                int v3;
+                v3 = v1;
+                v1 = v2;
+                v2 = v3;
+                return 1;
+            }
+            else
+            {
+                return 1;
+            }
+
         }
 
         private void button12_Click(object sender, EventArgs e)
